@@ -44,9 +44,9 @@ UsbCamNode::UsbCamNode(const rclcpp::NodeOptions & node_options)
   m_camera(new usb_cam::UsbCam()),
   m_image_msg(new sensor_msgs::msg::Image()),
   m_compressed_img_msg(nullptr),
-  m_image_publisher(std::make_shared<image_transport::CameraPublisher>(
-      image_transport::create_camera_publisher(this, BASE_TOPIC_NAME,
-      rclcpp::QoS {10}.get_rmw_qos_profile()))),
+  // m_image_publisher(std::make_shared<image_transport::CameraPublisher>(
+  //     image_transport::create_camera_publisher(this, BASE_TOPIC_NAME,
+  //     rclcpp::QoS {10}.get_rmw_qos_profile()))),
   m_compressed_image_publisher(nullptr),
   m_compressed_cam_info_publisher(nullptr),
   m_parameters(),
@@ -86,6 +86,11 @@ UsbCamNode::UsbCamNode(const rclcpp::NodeOptions & node_options)
 
   get_params();
   init();
+
+  m_image_publisher = std::make_shared<image_transport::CameraPublisher>(
+    image_transport::create_camera_publisher(this, m_parameters.camera_name + "/" + std::string(BASE_TOPIC_NAME),
+    rclcpp::QoS{5}.get_rmw_qos_profile()));
+
   m_parameters_callback_handle = add_on_set_parameters_callback(
     std::bind(
       &UsbCamNode::parameters_callback, this,
@@ -389,7 +394,7 @@ bool UsbCamNode::take_and_send_image()
 }
 
 bool UsbCamNode::take_and_send_image_mjpeg()
-{
+{ 
   // Only resize if required
   if (sizeof(m_compressed_img_msg->data) != m_camera->get_image_size_in_bytes()) {
     m_compressed_img_msg->format = "jpeg";
@@ -405,7 +410,7 @@ bool UsbCamNode::take_and_send_image_mjpeg()
 
   *m_camera_info_msg = m_camera_info->getCameraInfo();
   m_camera_info_msg->header = m_compressed_img_msg->header;
-
+  
   m_compressed_image_publisher->publish(*m_compressed_img_msg);
   m_compressed_cam_info_publisher->publish(*m_camera_info_msg);
   return true;

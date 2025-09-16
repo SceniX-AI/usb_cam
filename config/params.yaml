@@ -1,6 +1,7 @@
 /**:
     ros__parameters:
-      video_device: "/dev/v4l/by-id/usb-046d_Logitech_BRIO_E427DB1F-video-index0"
+      #video_device: "/dev/v4l/by-id/usb-046d_Logitech_BRIO_E427DB1F-video-index0"
+      video_device: "/dev/v4l/by-id/usb-046d_Logitech_BRIO_2F8BAD49-video-index0"
       framerate: 10.0
       io_method: "mmap"
       frame_id: "left_wrist_cam_link"
