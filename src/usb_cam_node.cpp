@@ -328,11 +328,11 @@ void UsbCamNode::set_v4l2_params()
 
   // check auto white balance
   if (m_parameters.auto_white_balance) {
-    m_camera->set_v4l_parameter("white_balance_temperature_auto", 1);
-    RCLCPP_INFO(this->get_logger(), "Setting 'white_balance_temperature_auto' to %d", 1);
+    m_camera->set_v4l_parameter("white_balance_automatic", 1);
+    RCLCPP_INFO(this->get_logger(), "Setting 'white_balance_automatic' to %d", 1);
   } else {
     RCLCPP_INFO(this->get_logger(), "Setting 'white_balance' to %d", m_parameters.white_balance);
-    m_camera->set_v4l_parameter("white_balance_temperature_auto", 0);
+    m_camera->set_v4l_parameter("white_balance_automatic", 0);
     m_camera->set_v4l_parameter("white_balance_temperature", m_parameters.white_balance);
   }
 
