@@ -407,6 +407,7 @@ bool UsbCamNode::take_and_send_image()
   auto stamp = m_camera->get_image_timestamp();
   m_image_msg->header.stamp.sec = stamp.tv_sec;
   m_image_msg->header.stamp.nanosec = stamp.tv_nsec;
+  // m_image_msg->header.stamp = this->now();
 
   *m_camera_info_msg = m_camera_info->getCameraInfo();
   m_camera_info_msg->header = m_image_msg->header;

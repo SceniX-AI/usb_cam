@@ -1,8 +1,9 @@
+from launch_ros.actions import Node
+from launch_ros.substitutions import FindPackageShare
+
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
-from launch.substitutions import PathJoinSubstitution, LaunchConfiguration
-from launch_ros.substitutions import FindPackageShare
-from launch_ros.actions import Node
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 
 
 def launch_setup(context, *args, **kwargs):
@@ -38,12 +39,8 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             name="param_file",
-            default_value=PathJoinSubstitution(
-                [FindPackageShare("usb_cam"), "config", "params.yaml"]
-            ),
+            default_value=PathJoinSubstitution([FindPackageShare("usb_cam"), "config", "params.yaml"]),
             description="camera_namespace",
         ),
     ]
-    return LaunchDescription(
-        declared_arguments + [OpaqueFunction(function=launch_setup)]
-    )
+    return LaunchDescription(declared_arguments + [OpaqueFunction(function=launch_setup)])
