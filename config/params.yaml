@@ -1,29 +1,29 @@
 /**:
-    ros__parameters:
-      video_device: "/dev/video0"
-      framerate: 30.0
-      io_method: "mmap"
-      frame_id: "my_camera_link"
-      pixel_format: "mjpeg2rgb"
-      av_device_format: "YUV422P"
-      image_width: 1920 
-      image_height: 1080
-      camera_name: "my_camera"
-      # you can add the camera_info_url parameter to load the camera calibration parameters from a yaml file. 
-      # The url should be in the format of the file path, 
-      # for example: "file:///home/jay/robot_ws/src/usb_cam/config/camera_info.yaml"
-      # or you can use the package:// prefix to specify the path relative to the package, 
-      # for example: "package://usb_cam/config/camera_info.yaml"
-      camera_info_url: "package://usb_cam/config/camera_info.yaml"
-      # camera_info_url: "file:///home/jay/robot_ws/src/usb_cam/config/camera_info.yaml"
-      brightness: -1
-      contrast: -1
-      saturation: -1
-      sharpness: -1
-      gain: -1
-      auto_white_balance: true
-      white_balance: 4000
-      autoexposure: true
-      exposure: 100
-      autofocus: false
-      focus: 40
+  ros__parameters:
+    video_device: "/dev/video0"
+    framerate: 60.0
+    io_method: "mmap"
+    frame_id: "my_camera_link"
+    pixel_format: "mjpeg2rgb"
+    av_device_format: "YUV422P"
+    image_width: 1920
+    image_height: 1080
+    camera_name: "my_camera"
+    # you can add the camera_info_url parameter to load the camera calibration parameters from a yaml file.
+    # The url should be in the format of the file path,
+    # for example: "file:///home/jay/robot_ws/src/usb_cam/config/camera_info.yaml"
+    # or you can use the package:// prefix to specify the path relative to the package,
+    # for example: "package://usb_cam/config/camera_info.yaml"
+    camera_info_url: "package://usb_cam/config/camera_info.yaml"
+    # camera_info_url: "file:///home/jay/robot_ws/src/usb_cam/config/camera_info.yaml"
+    brightness: -1
+    contrast: -1
+    saturation: -1
+    sharpness: -1
+    gain: -1
+    auto_white_balance: true
+    white_balance: 4000
+    autoexposure: true
+    exposure: 100
+    autofocus: false
+    focus: 40
