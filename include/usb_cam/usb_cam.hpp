@@ -30,11 +30,6 @@
 #ifndef USB_CAM__USB_CAM_HPP_
 #define USB_CAM__USB_CAM_HPP_
 
-extern "C" {
-#include <libavcodec/avcodec.h>
-#include <linux/videodev2.h>
-}
-
 #include <chrono>
 #include <memory>
 #include <algorithm>
@@ -125,6 +120,8 @@ typedef struct parameters_t
   bool auto_white_balance;
   bool autoexposure;
   bool autofocus;
+  // When true, UsbCamNode will not validate the device exists in available V4L2 devices
+  bool skip_device_check;
 
   parameters_t()
 // *INDENT-OFF*
@@ -148,7 +145,8 @@ typedef struct parameters_t
     focus(-1),
     auto_white_balance(true),
     autoexposure(true),
-    autofocus(false)
+    autofocus(false),
+    skip_device_check(false)
   {
   }
 // *INDENT-ON*
@@ -238,6 +236,11 @@ public:
     return m_image.height;
   }
 
+  inline size_t get_frame_rate()
+  {
+    return m_framerate;
+  }
+
   inline size_t get_image_size_in_bytes()
   {
     return m_image.size_in_bytes;
@@ -288,26 +291,6 @@ public:
   inline unsigned int number_of_buffers()
   {
     return m_number_of_buffers;
-  }
-
-  inline AVCodec * get_avcodec()
-  {
-    return m_avcodec;
-  }
-
-  inline AVDictionary * get_avoptions()
-  {
-    return m_avoptions;
-  }
-
-  inline AVCodecContext * get_avcodec_context()
-  {
-    return m_avcodec_context;
-  }
-
-  inline AVFrame * get_avframe()
-  {
-    return m_avframe;
   }
 
   inline bool is_capturing()
@@ -401,6 +384,50 @@ public:
     return m_image.pixel_format;
   }
 
+  inline size_t set_frame_rate(const parameters_t & parameters)
+  {
+    std::shared_ptr<pixel_format_base> found_driver_format = nullptr;
+
+    formats::format_arguments_t args({
+        parameters.pixel_format_name,
+        parameters.image_width,
+        parameters.image_height,
+        m_image.number_of_pixels,
+        parameters.av_device_format,
+      });
+    // First check if given format is supported by this driver
+    for (auto driver_fmt : driver_supported_formats(args)) {
+      if (driver_fmt->name() == args.name) {
+        found_driver_format = driver_fmt;
+      }
+    }
+
+    if (found_driver_format == nullptr) {
+      // List the supported formats of this driver for the user before throwing
+      std::cerr << "This driver supports the following formats:" << std::endl;
+      for (auto driver_fmt : driver_supported_formats(args)) {
+        std::cerr << "\t" << driver_fmt->name() << std::endl;
+      }
+      throw std::invalid_argument(
+              "Specified format `" + args.name + "` is unsupported by this ROS driver"
+      );
+    }
+
+    for (auto fmt : this->supported_formats()) {
+      if (fmt.v4l2_fmt.width == static_cast<size_t>(parameters.image_width) &&
+        fmt.v4l2_fmt.height == static_cast<size_t>(parameters.image_height) &&
+        fmt.v4l2_fmt.pixel_format == found_driver_format->v4l2()) {
+        return fmt.v4l2_fmt.discrete.denominator / fmt.v4l2_fmt.discrete.numerator;
+      }
+    }
+
+    throw std::invalid_argument(
+      "Specified resolution `" + std::to_string(parameters.image_width) +
+      "x" + std::to_string(parameters.image_height) +
+      "` is unsupported by `" + parameters.device_name + "`"
+    );
+  }
+
 private:
   void init_read();
   void init_mmap();
@@ -421,11 +448,6 @@ private:
   unsigned int m_number_of_buffers;
   std::shared_ptr<usb_cam::utils::buffer[]> m_buffers;
   image_t m_image;
-
-  AVFrame * m_avframe;
-  AVCodec * m_avcodec;
-  AVDictionary * m_avoptions;
-  AVCodecContext * m_avcodec_context;
 
   bool m_is_capturing;
   int m_framerate;
